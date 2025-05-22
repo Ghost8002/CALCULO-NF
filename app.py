@@ -35,34 +35,64 @@ def ler_excel(arquivo):
 st.title("Calculadora de Notas Fiscais")
 st.write("Faça upload dos arquivos Excel para calcular os totais de notas fiscais.")
 
+# Seleção do modo de upload
+modo_upload = st.radio(
+    "Escolha o modo de upload:",
+    ["Seleção Manual", "Detecção Automática pelo Nome"],
+    horizontal=True
+)
+
 # Upload dos arquivos
 st.subheader("Upload dos Arquivos")
 
-# Criar colunas para os uploads
-col1, col2, col3 = st.columns(3)
+if modo_upload == "Seleção Manual":
+    # Criar colunas para os uploads
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.write("**NF Emitidas**")
-    nf_emitidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="emitidas")
+    with col1:
+        st.write("**NF Emitidas**")
+        nf_emitidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="emitidas")
 
-with col2:
-    st.write("**NF Recebidas**")
-    nf_recebidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="recebidas")
+    with col2:
+        st.write("**NF Recebidas**")
+        nf_recebidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="recebidas")
 
-with col3:
-    st.write("**NFC Emitidas**")
-    nfc_emitidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="nfc")
+    with col3:
+        st.write("**NFC Emitidas**")
+        nfc_emitidas = st.file_uploader("Selecione o arquivo", type=['xlsx', 'xls'], key="nfc")
+
+    arquivos = {
+        'nf_emitidas': nf_emitidas,
+        'nf_recebidas': nf_recebidas,
+        'nfc_emitidas': nfc_emitidas
+    }
+
+else:  # Detecção Automática
+    uploaded_files = st.file_uploader(
+        "Selecione os arquivos Excel (NF Emitidas, NF Recebidas e/ou NFC Emitidas)",
+        type=['xlsx', 'xls'],
+        accept_multiple_files=True
+    )
+
+    arquivos = {
+        'nf_emitidas': None,
+        'nf_recebidas': None,
+        'nfc_emitidas': None
+    }
+
+    if uploaded_files:
+        for file in uploaded_files:
+            nome_arquivo = file.name.lower()
+            if 'emitida' in nome_arquivo and 'nfc' not in nome_arquivo:
+                arquivos['nf_emitidas'] = file
+            elif 'recebida' in nome_arquivo:
+                arquivos['nf_recebidas'] = file
+            elif 'nfc' in nome_arquivo:
+                arquivos['nfc_emitidas'] = file
 
 if st.button("Calcular Totais"):
-    if nf_emitidas or nf_recebidas:  # Pelo menos um dos arquivos principais deve estar presente
+    if arquivos['nf_emitidas'] or arquivos['nf_recebidas']:  # Pelo menos um dos arquivos principais deve estar presente
         try:
-            # Dicionário para armazenar os arquivos
-            arquivos = {
-                'nf_emitidas': nf_emitidas,
-                'nf_recebidas': nf_recebidas,
-                'nfc_emitidas': nfc_emitidas
-            }
-            
             # Verificar quais arquivos foram carregados
             arquivos_carregados = {k: v for k, v in arquivos.items() if v is not None}
             
@@ -128,16 +158,21 @@ if st.button("Calcular Totais"):
 # Adicionar informações de ajuda
 with st.expander("Como usar"):
     st.write("""
-    1. Selecione os arquivos Excel (.xlsx ou .xls) para cada tipo de nota fiscal:
-       - NF Emitidas (obrigatório se não houver NF Recebidas)
-       - NF Recebidas (obrigatório se não houver NF Emitidas)
-       - NFC Emitidas (opcional)
-    2. Clique em 'Calcular Totais'
+    Escolha o modo de upload:
     
-    Observações:
-    - Os arquivos podem estar no formato Excel (.xlsx ou .xls)
-    - É necessário pelo menos um arquivo de NF Emitidas ou NF Recebidas
-    - O arquivo de NFC Emitidas é opcional
-    - A planilha deve ter o nome 'RelatorioNotas'
-    - As colunas necessárias são: 'Valor N.F.', 'Situacao', 'Operacao'
+    1. **Seleção Manual**:
+       - Selecione cada arquivo separadamente
+       - Escolha explicitamente qual tipo de nota fiscal cada arquivo representa
+    
+    2. **Detecção Automática**:
+       - Selecione todos os arquivos de uma vez
+       - O sistema identificará automaticamente pelo nome do arquivo
+       - Os nomes devem conter: 'emitida', 'recebida' ou 'nfc'
+    
+    Requisitos dos arquivos:
+    - Formato: Excel (.xlsx ou .xls)
+    - Planilha: 'RelatorioNotas'
+    - Colunas necessárias: 'Valor N.F.', 'Situacao', 'Operacao'
+    - Pelo menos um arquivo de NF Emitidas ou NF Recebidas é obrigatório
+    - NFC Emitidas é opcional
     """) 
