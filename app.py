@@ -2,14 +2,21 @@ import streamlit as st
 import pandas as pd
 from codigo import calcular_totais
 import os
-import locale
-
-# Configurar locale para português do Brasil
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 def formatar_valor(valor):
     """Formata o valor para o padrão brasileiro"""
-    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    try:
+        # Converte para string com 2 casas decimais
+        valor_str = f"{valor:,.2f}"
+        # Substitui a vírgula por X (temporário)
+        valor_str = valor_str.replace(",", "X")
+        # Substitui o ponto por vírgula
+        valor_str = valor_str.replace(".", ",")
+        # Substitui X por ponto
+        valor_str = valor_str.replace("X", ".")
+        return f"R$ {valor_str}"
+    except:
+        return f"R$ {valor:,.2f}"
 
 st.set_page_config(page_title="Calculadora de Notas Fiscais", page_icon="📊")
 
