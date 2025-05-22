@@ -171,8 +171,4 @@ with st.expander("Como usar"):
     
     Requisitos dos arquivos:
     - Formato: Excel (.xlsx ou .xls)
-    - Planilha: 'RelatorioNotas'
-    - Colunas necessárias: 'Valor N.F.', 'Situacao', 'Operacao'
-    - Pelo menos um arquivo de NF Emitidas ou NF Recebidas é obrigatório
-    - NFC Emitidas é opcional
     """) 
