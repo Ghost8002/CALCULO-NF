@@ -61,9 +61,9 @@ def calcular_totais(nf_emitidas_path, nf_recebidas_path, nfc_emitidas_path=None)
         df_nfc_emitidas = pd.DataFrame(columns=df_nf_emitidas.columns)  # vazio se não informado
 
     # Filtrar notas válidas (não canceladas)
-    emitidas_validas = df_nf_emitidas[df_nf_emitidas['Situacao'] != 'Cancelamento']
-    recebidas_validas = df_nf_recebidas[df_nf_recebidas['Situacao'] != 'Cancelamento']
-    nfc_emitidas_validas = df_nfc_emitidas[df_nfc_emitidas['Situacao'] != 'Cancelamento']
+    emitidas_validas = df_nf_emitidas[df_nf_emitidas['Situacao'] != 'Cancelamento de NF-e homologado']
+    recebidas_validas = df_nf_recebidas[df_nf_recebidas['Situacao'] != 'Cancelamento de NF-e homologado']
+    nfc_emitidas_validas = df_nfc_emitidas[df_nfc_emitidas['Situacao'] != 'Cancelamento de NF-e homologado']
 
     # NF Emitidas:
     emitidas_saida = emitidas_validas[emitidas_validas['Operacao'] == 'SAIDA']['Valor N.F.'].sum()
